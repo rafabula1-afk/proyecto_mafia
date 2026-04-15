@@ -71,7 +71,6 @@ bool Node<T>::isLeaf() const {
     return !left && !right; 
 }
 
-
 template<class T>
 ArbolFamilia<T>::ArbolFamilia() : root(nullptr) {}
 
