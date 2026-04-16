@@ -16,8 +16,6 @@ private:
     Node<T> *left;
     Node<T> *right;
 
-    int calculateHeight(Node<T>* node);
-
 public:
     enum Ramas { IZQ = 0, DER = 1 };
 
@@ -32,6 +30,8 @@ public:
     int getHeight() const;
     void setHeight(int h);
     bool isLeaf() const;
+    
+    int calculateHeight(Node<T>* node);
 };
 
 template<class T>

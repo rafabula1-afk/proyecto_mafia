@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <limits>
 #include "arbol_familia.h"
 #include "miembro_mafia.h"
 
@@ -13,8 +14,9 @@ class GestorSucesion {
 private:
     ArbolFamilia<MiembroMafia> arbol;
     Node<MiembroMafia>* jefeActual;
+    std::string archivoDatos;
 
-
+    
     void cargarDesdeCSV(const std::string& filename);
     Node<MiembroMafia>* buscarSucesorEnArbolJefe(Node<MiembroMafia>* jefe);
     Node<MiembroMafia>* buscarSucesorEnCompaneros(Node<MiembroMafia>* jefe);
@@ -22,17 +24,17 @@ private:
     Node<MiembroMafia>* buscarPrimerSucesorVivoLibre();
     Node<MiembroMafia>* buscarPrimerSucesorEnPrison();
     void procesarSucesionAutomatica();
+    void guardarNodosEnArchivo(Node<MiembroMafia>* node, std::ofstream& archivo);
 
 public:
     GestorSucesion();
     ~GestorSucesion();
 
-    // Métodos públicos
     void inicializar(const std::string& archivoCSV);
     void mostrarLineaSucesion();
     void asignarNuevoJefe();
     void modificarMiembro(int id);
-    void guardarEstado(const std::string& filename);
+    void guardarEstado();
     void mostrarMenuPrincipal();
     bool verificarEstadoJefe();
 };

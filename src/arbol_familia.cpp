@@ -3,6 +3,7 @@
 
 #include "arbol_familia.h"
 
+
 template<class T>
 int Node<T>::calculateHeight(Node<T>* node) {
     if (node == nullptr) return 0;
@@ -64,12 +65,14 @@ int Node<T>::getHeight() const {
 template<class T>
 void Node<T>::setHeight(int h) { 
     height = h; 
+    setFe(); 
 }
 
 template<class T>
 bool Node<T>::isLeaf() const { 
     return !left && !right; 
 }
+
 
 template<class T>
 ArbolFamilia<T>::ArbolFamilia() : root(nullptr) {}
@@ -79,13 +82,11 @@ Node<T>* ArbolFamilia<T>::rotationSimpleIzq(Node<T>* node, Node<T>* child) {
     node->setLeft(child->getChild(DER));
     child->setRight(node);
     
-    if (child->getFe() == -1) {
-        node->setFe(0);
-        child->setFe(0);
-    } else {
-        node->setFe(-1);
-        child->setFe(1);
-    }
+  
+    node->setHeight(node->calculateHeight(node));
+    child->setHeight(child->calculateHeight(child));
+    
+  
     return child;
 }
 
@@ -94,41 +95,44 @@ Node<T>* ArbolFamilia<T>::rotationSimpleDer(Node<T>* node, Node<T>* child) {
     node->setRight(child->getChild(IZQ));
     child->setLeft(node);
     
-    if (child->getFe() == 1) {
-        node->setFe(0);
-        child->setFe(0);
-    } else {
-        node->setFe(1);
-        child->setFe(-1);
-    }
+
+    node->setHeight(node->calculateHeight(node));
+    child->setHeight(child->calculateHeight(child));
+    
     return child;
 }
 
 template<class T>
 Node<T>* ArbolFamilia<T>::rotationDoubleIzq(Node<T>* node, Node<T>* child) {
     Node<T>* grandChild = child->getChild(IZQ);
+    
     node->setRight(grandChild->getChild(IZQ));
     grandChild->setLeft(node);
     child->setLeft(grandChild->getChild(DER));
     grandChild->setRight(child);
     
-    node->setFe((grandChild->getFe() == 1) ? -1 : 0);
-    child->setFe((grandChild->getFe() == -1) ? 1 : 0);
-    grandChild->setFe(0);
+  
+    node->setHeight(node->calculateHeight(node));
+    child->setHeight(child->calculateHeight(child));
+    grandChild->setHeight(grandChild->calculateHeight(grandChild));
+    
     return grandChild;
 }
 
 template<class T>
 Node<T>* ArbolFamilia<T>::rotationDoubleDer(Node<T>* node, Node<T>* child) {
     Node<T>* grandChild = child->getChild(DER);
+    
     node->setLeft(grandChild->getChild(DER));
     grandChild->setRight(node);
     child->setRight(grandChild->getChild(IZQ));
     grandChild->setLeft(child);
     
-    child->setFe((grandChild->getFe() == 1) ? -1 : 0);
-    node->setFe((grandChild->getFe() == -1) ? 1 : 0);
-    grandChild->setFe(0);
+  
+    node->setHeight(node->calculateHeight(node));
+    child->setHeight(child->calculateHeight(child));
+    grandChild->setHeight(grandChild->calculateHeight(grandChild));
+    
     return grandChild;
 }
 
@@ -141,47 +145,52 @@ Node<T>* ArbolFamilia<T>::insert(Node<T>* node, T data, bool& heightChanged) {
 
     if (node->getData() > data) {
         node->setLeft(insert(node->getChild(IZQ), data, heightChanged));
+        
         if (heightChanged) {
+            node->setHeight(node->calculateHeight(node));
+            
             Node<T>* child = nullptr;
-            switch (node->getFe()) {
-                case 1:
-                    node->setFe(0);
-                    heightChanged = false;
-                    break;
-                case 0:
-                    node->setFe(-1);
-                    break;
-                case -1:
-                    child = node->getChild(IZQ);
-                    node = (child->getFe() == -1) ? 
-                           rotationSimpleIzq(node, child) : 
-                           rotationDoubleDer(node, child);
-                    heightChanged = false;
-                    break;
+            int fe = node->getFe();
+            
+            if (fe == 1) {
+                heightChanged = false;
+            } else if (fe == 0) {
+               
+            } else if (fe == -1) {
+                child = node->getChild(IZQ);
+                if (child->getFe() == -1) {
+                    node = rotationSimpleIzq(node, child);
+                } else {
+                    node = rotationDoubleDer(node, child);
+                }
+                heightChanged = false;
             }
         }
     } else if (node->getData() < data) {
         node->setRight(insert(node->getChild(DER), data, heightChanged));
+        
         if (heightChanged) {
+            node->setHeight(node->calculateHeight(node));
+            
             Node<T>* child = nullptr;
-            switch (node->getFe()) {
-                case 1:
-                    child = node->getChild(DER);
-                    node = (child->getFe() == 1) ? 
-                           rotationSimpleDer(node, child) : 
-                           rotationDoubleIzq(node, child);
-                    heightChanged = false;
-                    break;
-                case 0:
-                    node->setFe(1);
-                    break;
-                case -1:
-                    node->setFe(0);
-                    heightChanged = false;
-                    break;
+            int fe = node->getFe();
+            
+            if (fe == 1) {
+                child = node->getChild(DER);
+                if (child->getFe() == 1) {
+                    node = rotationSimpleDer(node, child);
+                } else {
+                    node = rotationDoubleIzq(node, child);
+                }
+                heightChanged = false;
+            } else if (fe == 0) {
+               
+            } else if (fe == -1) {
+                heightChanged = false;
             }
         }
     }
+    
     return node;
 }
 
@@ -195,10 +204,10 @@ template<class T>
 Node<T>* ArbolFamilia<T>::buscarNodo(Node<T>* node, int id) {
     if (!node) return nullptr;
     
-    T tempData = node->getData();
-    tempData = T(id, "", "", 'H', 0, 0, false, false, false, false);
-    
     if (node->getData().getId() == id) return node;
+    
+   
+    T tempData = T(id, "", "", 'H', 0, 0, false, false, false, false);
     
     if (node->getData() > tempData)
         return buscarNodo(node->getChild(IZQ), id);
