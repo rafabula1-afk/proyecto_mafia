@@ -122,9 +122,9 @@ void MiembroMafia::mostrarInfo() const {
     std::cout << "ID: " << id 
               << " | Nombre: " << getFullName() 
               << " | Edad: " << age 
-              << " | GÃ©nero: " << gender
-              << " | Jefe: " << (isBoss ? "SÃ­" : "No")
-              << " | Vivo: " << (isDead ? "No" : "SÃ­")
-              << " | En prisiÃ³n: " << (inJail ? "SÃ­" : "No") 
+              << " | Genero: " << gender
+              << " | Jefe: " << (isBoss ? "Si­" : "No")
+              << " | Vivo: " << (isDead ? "No" : "Si­")
+              << " | En prision: " << (inJail ? "Si­" : "No") 
               << std::endl;
 }

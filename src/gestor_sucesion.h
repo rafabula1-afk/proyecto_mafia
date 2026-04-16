@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <limits>
 #include "arbol_familia.h"
 #include "miembro_mafia.h"
@@ -16,8 +15,8 @@ private:
     Node<MiembroMafia>* jefeActual;
     std::string archivoDatos;
 
-    
     void cargarDesdeCSV(const std::string& filename);
+    void crearDatosEjemplo();
     Node<MiembroMafia>* buscarSucesorEnArbolJefe(Node<MiembroMafia>* jefe);
     Node<MiembroMafia>* buscarSucesorEnCompaneros(Node<MiembroMafia>* jefe);
     Node<MiembroMafia>* buscarSucesorEnJerarquiaSuperior(Node<MiembroMafia>* jefe);

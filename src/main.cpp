@@ -2,9 +2,8 @@
 #include "gestor_sucesion.h"
 
 int main() {
-    std::cout << "\n╔════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  SISTEMA DE SUCESIÓN - FAMILIA MAFIA   ║" << std::endl;
-    std::cout << "╚════════════════════════════════════════╝\n" << std::endl;
+    std::cout << "SISTEMA DE SUCESION - FAMILIA MAFIA" << std::endl;
+    std::cout << "\n" << std::endl;
     
     GestorSucesion gestor;
     

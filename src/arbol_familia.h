@@ -31,7 +31,7 @@ public:
     void setHeight(int h);
     bool isLeaf() const;
     
-    int calculateHeight(Node<T>* node);
+    static int calculateHeight(Node<T>* node);
 };
 
 template<class T>

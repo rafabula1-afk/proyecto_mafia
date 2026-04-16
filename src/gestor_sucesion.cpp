@@ -1,44 +1,88 @@
 #include "gestor_sucesion.h"
 
-
 GestorSucesion::GestorSucesion() : jefeActual(nullptr), archivoDatos("") {}
 
-
 GestorSucesion::~GestorSucesion() {}
+
+void GestorSucesion::crearDatosEjemplo() {
+    MiembroMafia vito(1, "Vito", "Corleone", 'H', 65, 0, false, false, true, true);
+    MiembroMafia sonny(2, "Sonny", "Corleone", 'H', 40, 1, false, false, false, false);
+    MiembroMafia fredo(3, "Fredo", "Corleone", 'H', 38, 1, false, false, false, false);
+    MiembroMafia michael(4, "Michael", "Corleone", 'H', 35, 1, false, false, false, false);
+    MiembroMafia tom(5, "Tom", "Hagen", 'H', 45, 1, false, false, false, false);
+    MiembroMafia clemenza(6, "Peter", "Clemenza", 'H', 55, 1, false, false, false, false);
+    MiembroMafia tessio(7, "Salvatore", "Tessio", 'H', 58, 1, false, false, false, false);
+    MiembroMafia vincent(8, "Vincent", "Mancini", 'H', 25, 4, false, false, false, false);
+    MiembroMafia connie(9, "Connie", "Corleone", 'M', 42, 1, false, false, false, false);
+    MiembroMafia luca(10, "Luca", "Brasi", 'H', 50, 1, true, false, false, false);
+    MiembroMafia carlo(11, "Carlo", "Rizzi", 'H', 30, 1, false, true, false, false);
+    MiembroMafia joey(12, "Joey", "Zasa", 'H', 48, 0, false, false, false, false);
+    
+    arbol.insertar(vito);
+    arbol.insertar(sonny);
+    arbol.insertar(fredo);
+    arbol.insertar(michael);
+    arbol.insertar(tom);
+    arbol.insertar(clemenza);
+    arbol.insertar(tessio);
+    arbol.insertar(vincent);
+    arbol.insertar(connie);
+    arbol.insertar(luca);
+    arbol.insertar(carlo);
+    arbol.insertar(joey);
+    
+    jefeActual = arbol.buscar(1);
+}
 
 void GestorSucesion::cargarDesdeCSV(const std::string& filename) {
     std::ifstream archivo(filename);
     
     if (!archivo.is_open()) {
-        std::cerr << "Error: No se pudo abrir el archivo " << filename << std::endl;
+        std::cout << "Archivo no encontrado. Creando datos de ejemplo..." << std::endl;
+        crearDatosEjemplo();
+        guardarEstado();
+        std::cout << "Archivo creado con 12 miembros." << std::endl;
         return;
     }
     
     std::string linea;
     std::getline(archivo, linea);
     
+    if (linea.empty()) {
+        std::cout << "Archivo vacio. Llenando con datos de ejemplo..." << std::endl;
+        archivo.close();
+        crearDatosEjemplo();
+        guardarEstado();
+        std::cout << "Archivo llenado con 12 miembros." << std::endl;
+        return;
+    }
+    
+    bool tieneDatos = false;
     while (std::getline(archivo, linea)) {
+        tieneDatos = true;
         std::stringstream ss(linea);
-        std::string campo;
-        std::vector<std::string> campos;
-        
-        while (std::getline(ss, campo, ',')) {
-            campos.push_back(campo);
-        }
-        
-        if (campos.size() >= 10) {
-            MiembroMafia miembro(
-                std::stoi(campos[0]),
-                campos[1],
-                campos[2],
-                campos[3][0],
-                std::stoi(campos[4]),
-                std::stoi(campos[5]),
-                std::stoi(campos[6]) == 1,
-                std::stoi(campos[7]) == 1,
-                std::stoi(campos[8]) == 1,
-                std::stoi(campos[9]) == 1
-            );
+		std::string campos[10]; 
+		int i = 0;
+		std::string campo;
+		
+		while (std::getline(ss, campo, ',') && i < 10) {
+		    campos[i] = campo;
+		    i++;
+		}
+		
+		if (i >= 10) {
+		    MiembroMafia miembro(
+		        std::stoi(campos[0]),
+		        campos[1],
+		        campos[2],
+		        campos[3][0],
+		        std::stoi(campos[4]),
+		        std::stoi(campos[5]),
+		        std::stoi(campos[6]) == 1,
+		        std::stoi(campos[7]) == 1,
+		        std::stoi(campos[8]) == 1,
+		        std::stoi(campos[9]) == 1
+		    );
             
             arbol.insertar(miembro);
             
@@ -49,7 +93,16 @@ void GestorSucesion::cargarDesdeCSV(const std::string& filename) {
     }
     
     archivo.close();
-    std::cout << "Datos cargados exitosamente. ";
+    
+    if (!tieneDatos) {
+        std::cout << "Archivo solo tiene cabecera. Llenando con datos de ejemplo..." << std::endl;
+        crearDatosEjemplo();
+        guardarEstado();
+        std::cout << "Archivo llenado con 12 miembros." << std::endl;
+        return;
+    }
+    
+    std::cout << "Datos cargados exitosamente desde " << filename << std::endl;
     std::cout << "Jefe actual: ";
     if (jefeActual) {
         std::cout << jefeActual->getData().getFullName() << std::endl;
@@ -65,7 +118,7 @@ void GestorSucesion::inicializar(const std::string& archivoCSV) {
 
 void GestorSucesion::mostrarLineaSucesion() {
     std::cout << "\n=========================================" << std::endl;
-    std::cout << "     LÍNEA DE SUCESIÓN DE LA FAMILIA     " << std::endl;
+    std::cout << "     LINEA DE SUCESION DE LA FAMILIA     " << std::endl;
     std::cout << "=========================================" << std::endl;
     
     arbol.mostrarLineaSucesion();
@@ -91,8 +144,6 @@ Node<MiembroMafia>* GestorSucesion::buscarSucesorEnArbolJefe(Node<MiembroMafia>*
 
 Node<MiembroMafia>* GestorSucesion::buscarSucesorEnCompaneros(Node<MiembroMafia>* jefe) {
     if (!jefe) return nullptr;
-    int idBoss = jefe->getData().getIdBoss();
-    if (idBoss == 0) return nullptr;
     return arbol.encontrarPrimerSucesor();
 }
 
@@ -111,17 +162,17 @@ Node<MiembroMafia>* GestorSucesion::buscarPrimerSucesorEnPrison() {
 
 void GestorSucesion::procesarSucesionAutomatica() {
     if (!jefeActual) {
-        std::cout << "No hay jefe actual. Buscando primer sucesor válido..." << std::endl;
+        std::cout << "No hay jefe actual. Buscando primer sucesor valido..." << std::endl;
         jefeActual = buscarPrimerSucesorVivoLibre();
         
         if (!jefeActual) {
-            std::cout << "No se encontraron sucesores libres. Buscando en prisión..." << std::endl;
+            std::cout << "No se encontraron sucesores libres. Buscando en prisi�n..." << std::endl;
             jefeActual = buscarPrimerSucesorEnPrison();
         }
         
         if (jefeActual) {
             arbol.actualizarJefatura(jefeActual);
-            std::cout << "¡NUEVO JEFE ASIGNADO!" << std::endl;
+            std::cout << "�NUEVO JEFE ASIGNADO!" << std::endl;
             jefeActual->getData().mostrarInfo();
         }
         return;
@@ -129,13 +180,13 @@ void GestorSucesion::procesarSucesionAutomatica() {
     
     MiembroMafia jefeData = jefeActual->getData();
     
-    std::cout << "\n--- INICIANDO PROCESO DE SUCESIÓN ---" << std::endl;
+    std::cout << "\n--- INICIANDO PROCESO DE SUCESION ---" << std::endl;
     std::cout << "Jefe actual: " << jefeData.getFullName() << std::endl;
     std::cout << "Motivo: ";
     
     if (jefeData.getIsDead()) std::cout << "Fallecimiento" << std::endl;
     else if (jefeData.getInJail()) std::cout << "Encarcelamiento" << std::endl;
-    else if (jefeData.getAge() > 70) std::cout << "Edad superior a 70 años" << std::endl;
+    else if (jefeData.getAge() > 70) std::cout << "Edad superior a 70 a�os" << std::endl;
     
     Node<MiembroMafia>* sucesor = buscarSucesorEnArbolJefe(jefeActual);
     if (!sucesor) sucesor = buscarSucesorEnCompaneros(jefeActual);
@@ -153,11 +204,11 @@ void GestorSucesion::procesarSucesionAutomatica() {
         jefeActual = sucesor;
         
         std::cout << "\n=========================================" << std::endl;
-        std::cout << "     ¡NUEVO JEFE DE LA FAMILIA!         " << std::endl;
+        std::cout << "     �NUEVO JEFE DE LA FAMILIA!         " << std::endl;
         std::cout << "=========================================" << std::endl;
         jefeActual->getData().mostrarInfo();
     } else {
-        std::cout << "\n¡ALERTA! No se pudo encontrar un sucesor válido." << std::endl;
+        std::cout << "\n�ALERTA! No se pudo encontrar un sucesor valido." << std::endl;
         jefeActual = nullptr;
     }
 }
@@ -165,7 +216,7 @@ void GestorSucesion::procesarSucesionAutomatica() {
 void GestorSucesion::asignarNuevoJefe() {
     if (!verificarEstadoJefe()) {
         std::cout << "El jefe actual sigue en condiciones de gobernar." << std::endl;
-        std::cout << "¿Desea forzar la sucesión? (S/N): ";
+        std::cout << "�Desea forzar la sucesion? (S/N): ";
         char respuesta;
         std::cin >> respuesta;
         if (respuesta != 'S' && respuesta != 's') return;
@@ -212,7 +263,7 @@ void GestorSucesion::guardarEstado() {
     guardarNodosEnArchivo(arbol.getRoot(), archivo);
     archivo.close();
     
-    std::cout << "✓ Datos guardados automáticamente en " << archivoDatos << std::endl;
+    std::cout << "Datos guardados en " << archivoDatos << std::endl;
 }
 
 void GestorSucesion::modificarMiembro(int id) {
@@ -235,12 +286,12 @@ void GestorSucesion::modificarMiembro(int id) {
         std::cout << "1. Cambiar nombre" << std::endl;
         std::cout << "2. Cambiar apellido" << std::endl;
         std::cout << "3. Cambiar edad" << std::endl;
-        std::cout << "4. Cambiar género" << std::endl;
+        std::cout << "4. Cambiar genero" << std::endl;
         std::cout << "5. Cambiar estado (vivo/muerto)" << std::endl;
-        std::cout << "6. Cambiar estado de prisión" << std::endl;
+        std::cout << "6. Cambiar estado de prisi�n" << std::endl;
         std::cout << "7. Marcar como ex-jefe" << std::endl;
         std::cout << "0. Guardar y salir" << std::endl;
-        std::cout << "Opción: ";
+        std::cout << "Opci�n: ";
         std::cin >> opcion;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         
@@ -265,24 +316,24 @@ void GestorSucesion::modificarMiembro(int id) {
                 if (valor > 0 && valor < 150) { miembro.setAge(valor); cambiosRealizados = true; }
                 break;
             case 4:
-                std::cout << "Nuevo género (H/M): ";
+                std::cout << "Nuevo genero (H/M): ";
                 std::cin >> genero;
                 if (genero == 'H' || genero == 'M') { miembro.setGender(genero); cambiosRealizados = true; }
                 break;
             case 5:
-                std::cout << "¿Está muerto? (1=Sí, 0=No): ";
+                std::cout << "�Esta muerto? (1=Si, 0=No): ";
                 std::cin >> valor;
                 miembro.setIsDead(valor == 1);
                 cambiosRealizados = true;
                 break;
             case 6:
-                std::cout << "¿Está en prisión? (1=Sí, 0=No): ";
+                std::cout << "�Esta en prision? (1=Si, 0=No): ";
                 std::cin >> valor;
                 miembro.setInJail(valor == 1);
                 cambiosRealizados = true;
                 break;
             case 7:
-                std::cout << "¿Fue jefe anteriormente? (1=Sí, 0=No): ";
+                std::cout << "�Fue jefe anteriormente? (1=Si, 0=No): ";
                 std::cin >> valor;
                 miembro.setWasBoss(valor == 1);
                 cambiosRealizados = true;
@@ -298,7 +349,7 @@ void GestorSucesion::modificarMiembro(int id) {
                 }
                 break;
             default:
-                std::cout << "Opción inválida." << std::endl;
+                std::cout << "Opci�n invalida." << std::endl;
         }
     } while (opcion != 0);
 }
@@ -310,14 +361,14 @@ void GestorSucesion::mostrarMenuPrincipal() {
         std::cout << "\n========================================" << std::endl;
         std::cout << "    FAMILIA MAFIA ITALIANA - GESTOR     " << std::endl;
         std::cout << "========================================" << std::endl;
-        std::cout << "1. Mostrar línea de sucesión actual" << std::endl;
-        std::cout << "2. Asignar nuevo jefe automáticamente" << std::endl;
+        std::cout << "1. Mostrar linea de sucesion actual" << std::endl;
+        std::cout << "2. Asignar nuevo jefe automaticamente" << std::endl;
         std::cout << "3. Modificar datos de un miembro" << std::endl;
         std::cout << "4. Verificar estado del jefe actual" << std::endl;
         std::cout << "5. Guardar estado manualmente" << std::endl;
         std::cout << "0. Salir del programa" << std::endl;
         std::cout << "----------------------------------------" << std::endl;
-        std::cout << "Seleccione una opción: ";
+        std::cout << "Seleccione una opcion: ";
         std::cin >> opcion;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         
@@ -334,7 +385,7 @@ void GestorSucesion::mostrarMenuPrincipal() {
             case 4:
                 if (verificarEstadoJefe()) {
                     std::cout << "El jefe actual NECESITA ser reemplazado." << std::endl;
-                    std::cout << "¿Desea iniciar el proceso de sucesión? (S/N): ";
+                    std::cout << "�Desea iniciar el proceso de sucesi�n? (S/N): ";
                     char respuesta;
                     std::cin >> respuesta;
                     if (respuesta == 'S' || respuesta == 's') {
@@ -342,18 +393,18 @@ void GestorSucesion::mostrarMenuPrincipal() {
                         guardarEstado();
                     }
                 } else {
-                    std::cout << "El jefe actual está en condiciones de continuar." << std::endl;
+                    std::cout << "El jefe actual esta en condiciones de continuar." << std::endl;
                 }
                 break;
             case 5: guardarEstado(); break;
             case 0:
                 std::cout << "\nGuardando datos antes de salir..." << std::endl;
                 guardarEstado();
-                std::cout << "\n¡Grazie per aver usato il sistema!" << std::endl;
-                std::cout << "¡Arrivederci!\n" << std::endl;
+                std::cout << "\n�Grazie per aver usato il sistema!" << std::endl;
+                std::cout << "�Arrivederci!\n" << std::endl;
                 break;
             default:
-                std::cout << "Opción inválida. Intente nuevamente." << std::endl;
+                std::cout << "Opci�n invalida. Intente nuevamente." << std::endl;
         }
     } while (opcion != 0);
 }

@@ -9,3 +9,5 @@ id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
 8,Vincent,Mancini,H,25,4,0,0,0,0
 9,Connie,Corleone,M,42,1,0,0,0,0
 10,Luca,Brasi,H,50,1,1,0,0,0
+11,Carlo,Rizzi,H,30,1,0,1,0,0
+12,Joey,Zasa,H,48,0,0,0,0,0
