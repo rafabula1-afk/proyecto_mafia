@@ -12,18 +12,10 @@
 class GestorSucesion {
 private:
     ArbolFamilia<MiembroMafia> arbol;
-    Node<MiembroMafia>* jefeActual;
-    std::string archivoDatos;
+    NodoSimple<MiembroMafia>* jefeActual;
 
-    void cargarDesdeCSV(const std::string& filename);
-    void crearDatosEjemplo();
-    Node<MiembroMafia>* buscarSucesorEnArbolJefe(Node<MiembroMafia>* jefe);
-    Node<MiembroMafia>* buscarSucesorEnCompaneros(Node<MiembroMafia>* jefe);
-    Node<MiembroMafia>* buscarSucesorEnJerarquiaSuperior(Node<MiembroMafia>* jefe);
-    Node<MiembroMafia>* buscarPrimerSucesorVivoLibre();
-    Node<MiembroMafia>* buscarPrimerSucesorEnPrison();
-    void procesarSucesionAutomatica();
-    void guardarNodosEnArchivo(Node<MiembroMafia>* node, std::ofstream& archivo);
+    void crearArchivoCSV();
+    void cargarDatosEnMemoria();
 
 public:
     GestorSucesion();
@@ -31,9 +23,9 @@ public:
 
     void inicializar(const std::string& archivoCSV);
     void mostrarLineaSucesion();
+    void mostrarJerarquiaFamiliar();
     void asignarNuevoJefe();
     void modificarMiembro(int id);
-    void guardarEstado();
     void mostrarMenuPrincipal();
     bool verificarEstadoJefe();
 };
