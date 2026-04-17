@@ -64,9 +64,49 @@ void ArbolFamilia<T>::actualizarJefatura(NodoSimple<T>* nuevoJefe) {
 }
 
 template<class T>
+void ArbolFamilia<T>::mostrarJerarquiaReal(NodoSimple<T>* node, int idBoss, int nivel) {
+    if (!node) return;
+    
+    mostrarJerarquiaReal(node->izquierda, idBoss, nivel);
+    
+    if (node->data.getIdBoss() == idBoss) {
+        for (int i = 0; i < nivel; i++) {
+            std::cout << "  ";
+        }
+        std::cout << "+-- ";
+        node->data.mostrarInfo();
+        
+        mostrarJerarquiaReal(root, node->data.getId(), nivel + 1);
+    }
+    
+    mostrarJerarquiaReal(node->derecha, idBoss, nivel);
+}
+
+template<class T>
 void ArbolFamilia<T>::mostrarJerarquiaPorCapas() {
-    std::cout << "\n=== ARBOL JERARQUICO ===" << std::endl;
-    inOrdenSimple(root);
+    if (!root) {
+        std::cout << "Arbol vacio" << std::endl;
+        return;
+    }
+    
+    NodoSimple<T>* jefe = buscarSimple(root, 1);
+    
+    if (!jefe) {
+        std::cout << "No se encontro el jefe supremo (ID=1)" << std::endl;
+        return;
+    }
+    
+    std::cout << "\n=== ARBOL JERARQUICO FAMILIAR ===" << std::endl;
+    std::cout << "JEFE SUPREMO:" << std::endl;
+    jefe->data.mostrarInfo();
+    std::cout << "|" << std::endl;
+    
+    mostrarJerarquiaReal(root, 1, 1);
+}
+
+template<class T>
+NodoSimple<T>* ArbolFamilia<T>::getRoot() {
+    return root;
 }
 
 #endif

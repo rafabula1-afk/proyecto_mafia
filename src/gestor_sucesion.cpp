@@ -77,10 +77,6 @@ void GestorSucesion::mostrarLineaSucesion() {
 
 void GestorSucesion::mostrarJerarquiaFamiliar() {
     arbol.mostrarJerarquiaPorCapas();
-    if (jefeActual) {
-        std::cout << "\n--- JEFE SUPREMO ---" << std::endl;
-        jefeActual->data.mostrarInfo();
-    }
 }
 
 bool GestorSucesion::verificarEstadoJefe() {

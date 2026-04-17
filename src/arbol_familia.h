@@ -23,6 +23,7 @@ private:
     void insertarSimple(NodoSimple<T>*& node, T data);
     NodoSimple<T>* buscarSimple(NodoSimple<T>* node, int id);
     void inOrdenSimple(NodoSimple<T>* node);
+    void mostrarJerarquiaReal(NodoSimple<T>* node, int idBoss, int nivel);
 
 public:
     ArbolFamilia();
@@ -31,6 +32,7 @@ public:
     void mostrarLineaSucesion();
     void actualizarJefatura(NodoSimple<T>* nuevoJefe);
     void mostrarJerarquiaPorCapas();
+    NodoSimple<T>* getRoot();
 };
 
 #include "arbol_familia.cpp"
